@@ -43,9 +43,8 @@ terms.
    Official source: https://github.com/Iskamele/ukrainify-black-reliquary/releases
    To ask for permission, open an issue in this repository.
 
-   These terms cover the author's own work only. Terms taken from the
-   Ukrainian edition of Frank Herbert's "Dune" (KSD) are used for consistency
-   and remain the publisher's; the game's own text remains its owners'.
+   These terms cover the author's own work only; the game's own text remains
+   its owners'.
 
    Українською. Переклад і глосарій — © 2026 Oleksandr Novikov, усі права
    захищено. Ви можете завантажити збірку з офіційного джерела (Releases цього
@@ -54,22 +53,19 @@ terms.
    деінде (сайти, лаунчери, каталоги, збірки, модпаки); використання перекладу
    повністю чи частково як основи для іншого перекладу, порту чи проєкту;
    будь-яке комерційне використання. Запит на дозвіл — через Issues цього
-   репозиторію. Ці умови стосуються лише власної роботи автора: терміни з
-   українського видання «Дюни» (КСД) належать видавцеві, текст гри — її
-   власникам.
+   репозиторію. Ці умови стосуються лише власної
+   роботи автора: текст гри належить її власникам.
 
 
 3. FONTS
-   No font files are included. The letters Ї ї Є є Ґ ґ are added at build time
-   to the fonts already installed with the game, on the user's own machine.
+   No font files are included. They are generated at build time from the fonts
+   already installed with the game, on the user's own machine.
 
 
 NOT INCLUDED
 
-This repository contains no files from the game. The build reads a copy you
-already own and writes the patch next to it; it ships nothing of Shiro Games'
-or Funcom's work.
+This repository contains no files from the game. The build reads the copy you
+already own.
 
-Black Reliquary is © Shiro Games, published by Funcom. Dune is © Herbert
-Properties LLC. This project is an unofficial community translation and is not
-affiliated with or endorsed by any of them.
+This project is an unofficial community translation and is not affiliated with
+or endorsed by the authors of Black Reliquary or Red Hook Studios.

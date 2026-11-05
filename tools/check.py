@@ -3,7 +3,7 @@
 
 stale        the English changed since the line was translated
 unknown      the key no longer exists
-placeholder  {...}, %s, %d or [BUTTON] differ from the English
+placeholder  {...}, %s, %d, [BUTTON] or an inline icon differ from the English
 glyph        a character missing from the fonts the build uses
 """
 import collections, os, re, sys
@@ -18,6 +18,10 @@ def glyphs():
         with open(os.path.join(br.GAME, "fonts", name + ".fnt"), encoding="utf-8", errors="replace") as f:
             sets.append({int(i) for i in re.findall(r"char id=(\d+)", f.read())})
     return set.intersection(*sets) | {10, 13}
+
+
+def tokens(text):
+    return collections.Counter(br.PLACEHOLDER.findall(text) + br.ICON.findall(text))
 
 
 def main():
@@ -39,9 +43,9 @@ def main():
         en = source[key]
         if src != br.fingerprint(en):
             report("stale", key)
-        if collections.Counter(br.PLACEHOLDER.findall(en)) != collections.Counter(br.PLACEHOLDER.findall(uk)):
+        if tokens(en) != tokens(uk):
             report("placeholder", key)
-        bad = {c for c in uk if ord(c) not in ok_chars}
+        bad = {c for c in uk if ord(c) not in ok_chars and c != br.ZERO_WIDTH and not br.ICON.match(c)}
         if bad:
             report("glyph", key, "".join(sorted(bad)))
 

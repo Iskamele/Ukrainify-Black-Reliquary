@@ -20,6 +20,10 @@ LABEL = "українська"
 ENTRY = re.compile(r'<entry id="([^"]+)"[^>]*>(.*?)</entry>', re.S)
 PLACEHOLDER = re.compile(r"\{[^{}]*\}|%[sd]|\[[A-Z][A-Z ]*\]")
 
+# Inline icons are drawn as IPA letters, and tooltips are padded with zero-width spaces.
+ICON = re.compile("[ɐ-˿]")
+ZERO_WIDTH = "​"
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
