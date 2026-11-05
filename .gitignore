@@ -1,0 +1,13 @@
+# game text and files generated from the game
+local/
+*.loc2
+*.tga
+*.fnt
+
+# translation and glossary live in Ukrainify-Private/black-reliquary
+/translation
+
+.idea/
+*.iml
+__pycache__/
+*.pyc
