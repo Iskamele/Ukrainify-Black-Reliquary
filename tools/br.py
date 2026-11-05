@@ -18,7 +18,7 @@ LABEL_ID = "str_language_" + LANG
 LABEL = "українська"
 
 ENTRY = re.compile(r'<entry id="([^"]+)"[^>]*>(.*?)</entry>', re.S)
-PLACEHOLDER = re.compile(r"\{[^{}]*\}|%[sd]|\[[A-Z][A-Z ]*\]")
+PLACEHOLDER = re.compile(r"\{[^{}]*\}|%[-+]?\d*[sd]|\[[A-Z][A-Z ]*\]")
 
 # Inline icons are drawn as IPA letters, and tooltips are padded with zero-width spaces.
 ICON = re.compile("[ɐ-˿]")

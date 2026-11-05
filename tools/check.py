@@ -17,7 +17,7 @@ def glyphs():
     for name in FONTS:
         with open(os.path.join(br.GAME, "fonts", name + ".fnt"), encoding="utf-8", errors="replace") as f:
             sets.append({int(i) for i in re.findall(r"char id=(\d+)", f.read())})
-    return set.intersection(*sets) | {10, 13}
+    return set.intersection(*sets) | {9, 10, 13}
 
 
 def tokens(text):
