@@ -11,7 +11,7 @@ import br
 
 def main():
     source = {k: en for name in br.tables() for k, _, en in br.read_table(name)}
-    lines = {k: (src, br.esc(uk)) for k, (src, uk) in br.read_translation().items()}
+    lines = br.read_translation()
     added = 0
     with open(sys.argv[1], encoding="utf-8") as f:
         for number, line in enumerate(f, 1):
@@ -24,12 +24,9 @@ def main():
             en = source[key]
             # Tooltip layout relies on the zero-width padding at the end of a line.
             pad = re.search(br.ZERO_WIDTH + "+$", en)
-            lines[key] = (br.fingerprint(en), uk + (pad.group() if pad else ""))
+            lines[key] = (br.fingerprint(en), br.unesc(uk) + (pad.group() if pad else ""))
             added += 1
-    with open(br.TRANSLATION, "w", encoding="utf-8", newline="\n") as f:
-        f.write("key\tsrc\tuk\n")
-        for key in sorted(lines):
-            f.write(f"{key}\t{lines[key][0]}\t{lines[key][1]}\n")
+    br.write_translation(lines)
     print(f"{added} lines merged, {len(lines)} in total")
 
 

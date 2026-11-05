@@ -3,6 +3,7 @@
 
     py tools/build.py               build into local/build/
     py tools/build.py --install     build and copy into the game
+    py tools/build.py --proofread   ship proofread lines only (for releases)
     py tools/build.py --uninstall   remove everything the install added
 
 Lines without a current translation stay English.
@@ -44,6 +45,10 @@ def build_strings():
         if name == "localization.exe" or name.endswith(".dll"):
             shutil.copy(os.path.join(win, name), os.path.join(work, "_windows"))
     translation = br.read_translation()
+    if "--proofread" in sys.argv:
+        import proof
+        keys = proof.proofread_keys()
+        translation = {k: v for k, v in translation.items() if k in keys}
     for name in br.tables():
         with open(os.path.join(work, "localization", name), "w", encoding="utf-8") as f:
             f.write(table_with_language(name, translation))

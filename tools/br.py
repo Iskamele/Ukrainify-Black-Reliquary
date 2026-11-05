@@ -72,3 +72,11 @@ def read_translation():
             key, src, uk = line.rstrip("\n").split("\t", 2)
             out[key] = (src, unesc(uk))
     return out
+
+
+def write_translation(lines):
+    with open(TRANSLATION, "w", encoding="utf-8", newline="\n") as f:
+        f.write("key\tsrc\tuk\n")
+        for key in sorted(lines):
+            src, uk = lines[key]
+            f.write(f"{key}\t{src}\t{esc(uk)}\n")
