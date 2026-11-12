@@ -4,6 +4,9 @@ local/
 *.tga
 *.fnt
 
+# Darkest Dungeon II localisation, a terminology reference (Red Hook Studios)
+/DD2Localization/
+
 # translation and glossary live in Ukrainify-Private/black-reliquary
 /translation
 
