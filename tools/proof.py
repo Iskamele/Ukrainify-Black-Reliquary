@@ -27,7 +27,9 @@ import br
 FOLDER = os.path.dirname(br.TRANSLATION)
 PATH = os.path.join(FOLDER, "proofreading.csv")
 GLOSSARY = os.path.join(FOLDER, "glossary.csv")
-GLOSSARY_HEAD = ["EN", "UA", "альтернатива", "категорія", "примітка", "затверджено"]
+GLOSSARY_HEAD = ["category", "key", "en", "uk", "ru", "gram", "status", "freq", "note"]
+STATUS = {"ref": "з DD2", "proposed": "пропозиція", "decide": "рішення потрібне", "todo": "без перекладу",
+          "approved": "затверджено"}
 HEAD = ["ключ", "розділ", "EN", "UA", "вичитано", "дата", "коментар", "відбиток"]
 OK_MARKS = {"✓", "✔", "+", "v", "V", "1"}
 EXCEL_ERROR = re.compile(r"^#(NAME\?|ИМЯ\?|ІМ'Я\?|VALUE!|ЗНАЧ!|REF!|ССЫЛКА!|ПОСИЛАННЯ!|N/A|Н/Д)")
@@ -37,14 +39,14 @@ def ok(mark):
     return mark.strip() in OK_MARKS
 
 
-def read_csv(path):
+def read_csv(path, delimiter=";"):
     with open(path, encoding="utf-8-sig", newline="") as f:
-        return list(csv.DictReader(f, delimiter=";"))
+        return list(csv.DictReader(f, delimiter=delimiter))
 
 
-def write_csv(path, head, rows):
+def write_csv(path, head, rows, delimiter=";"):
     buf = io.StringIO(newline="")
-    w = csv.writer(buf, delimiter=";", lineterminator="\r\n")
+    w = csv.writer(buf, delimiter=delimiter, lineterminator="\r\n")
     w.writerow(head)
     for r in rows:
         w.writerow([r[h] for h in head])
@@ -69,25 +71,27 @@ def write_sheet(rows):
 
 
 def glossary_note(g):
-    parts = [g["примітка"].strip()]
-    if g["альтернатива"].strip():
-        parts.insert(0, "або: " + g["альтернатива"].strip())
-    if g["затверджено"].startswith("рішення"):
-        parts.insert(0, "рішення потрібне")
-    return ". ".join(p for p in parts if p)
+    parts = [STATUS.get(g["status"], g["status"])]
+    if g["ru"]:
+        parts.append("ru: " + g["ru"])
+    if g["gram"]:
+        parts.append("рід: " + g["gram"])
+    if g["note"]:
+        parts.append(g["note"])
+    return " · ".join(parts)
 
 
 def sync():
     sheet = read_sheet()
     source = {k: en for name in br.tables() for k, _, en in br.read_table(name)}
     translation = br.read_translation()
-    glossary = read_csv(GLOSSARY)
-    by_en = {"glossary:" + g["EN"]: g for g in glossary}
+    glossary = read_csv(GLOSSARY, ",")
+    by_en = {"glossary:" + g["key"]: g for g in glossary}
     today = datetime.date.today().isoformat()
     marks, edited, dropped, skipped = {}, 0, [], []
 
     def current(key):
-        return by_en[key]["UA"] if key in by_en else translation[key][1]
+        return by_en[key]["uk"] if key in by_en else translation[key][1]
 
     for key, r in sheet.items():
         if key not in by_en and key not in translation:
@@ -101,7 +105,7 @@ def sync():
         if user_changed and r["UA"] != cur:
             edited += 1
             if key in by_en:
-                by_en[key]["UA"] = r["UA"]
+                by_en[key]["uk"] = r["UA"]
             else:
                 translation[key] = (translation[key][0], r["UA"])
         if ok(r["вичитано"]) and not user_changed and br.fingerprint(cur) != r["відбиток"]:
@@ -112,9 +116,9 @@ def sync():
     for key, g in by_en.items():
         r = marks.get(key)
         if r and ok(r["вичитано"]):
-            g["затверджено"] = "✓"
-        elif g["затверджено"] == "✓":
-            g["затверджено"] = ""
+            g["status"] = "approved"
+        elif g["status"] == "approved":
+            g["status"] = "proposed"
 
     rows = []
 
@@ -126,14 +130,15 @@ def sync():
                      "дата": (r.get("дата") or today) if ok(mark) else "",
                      "коментар": r.get("коментар", note), "відбиток": br.fingerprint(ua)})
 
-    for g in glossary:
-        add("glossary:" + g["EN"], "глосарій/" + g["категорія"], g["EN"], g["UA"], glossary_note(g))
+    # open decisions first, then by how often the game uses the term
+    for g in sorted(glossary, key=lambda g: (g["status"] != "decide", -int(g["freq"] or 0))):
+        add("glossary:" + g["key"], "глосарій/" + g["category"], g["en"], g["uk"], glossary_note(g))
     for key, en in source.items():
         if key in translation:
             add(key, key.split("/")[0], en.replace(br.ZERO_WIDTH, ""), translation[key][1], "")
 
     br.write_translation(translation)
-    write_csv(GLOSSARY, GLOSSARY_HEAD, glossary)
+    write_csv(GLOSSARY, GLOSSARY_HEAD, glossary, ",")
     write_sheet(rows)
     print(f"{len(rows)} rows, {edited} edited, {len(dropped)} marks dropped, {len(skipped)} skipped")
     for key in skipped:
